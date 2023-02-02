@@ -13,8 +13,8 @@ class Product(BaseModel):
     TAdesc: str
     TAsubcatid: int
 
-    truewidth: float
-    trueheight: float
+    width: float
+    height: float
     sellprice: float
 
     class Config:
@@ -22,6 +22,9 @@ class Product(BaseModel):
 
 
 class Panel(BaseModel):
+    
+    name: str
+    description: str
 
     framecolor: str
     sheetcolor: str
@@ -29,19 +32,23 @@ class Panel(BaseModel):
     wattage: int
     vocstc: float
 
+    width: float
+    height: float
+    sellprice: float
+
     class Config:
         orm_mode = True
 
 class MountingComponent(BaseModel):
 
     rendercolor: str
-    product_id: int
+    product_id: str
     mountingsystem: str
 
     class Config:
         orm_mode = True
 
-class MountingSystem(BaseModel):
+class MountingSystemCreate(BaseModel):
 
     name: str
 
@@ -49,7 +56,7 @@ class MountingSystem(BaseModel):
         orm_mode = True
 
 
-class MountingSystem(MountingSystem):
+class MountingSystem(MountingSystemCreate):
     name: str
     components: list[MountingComponent]
 

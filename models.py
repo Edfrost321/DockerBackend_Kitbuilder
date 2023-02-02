@@ -16,32 +16,36 @@ class Customer(Base):
 class Product(Base):
     __tablename__ = "product"
 
-    id = Column(Integer, primary_key=True, index=True)
     TAstockcode = Column(VARCHAR(30), unique=True)
-    TAman_code = Column(VARCHAR(30), unique=True, index=True)
+    TAman_code = Column(VARCHAR(30), primary_key=True, unique=True, index=True)
     TAdesc = Column(VARCHAR(250))
     TAsubcatid = Column(Integer)
 
-    truewidth = Column(Float)
-    trueheight = Column(Float)
+    width = Column(Float)
+    height = Column(Float)
     sellprice = Column(Numeric(2))
 
-    panel = relationship("Panel", uselist=False, backref="product")
     mountingcomponent = relationship("MountingComponent", uselist=False, backref="product")
     
 
 class Panel(Base):
+    # Panels aren't linked to a product because they're not on TradeAccounts
+    # so importing the man_code won't work
     __tablename__ = "panel"
 
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    description = Column(String)
 
     framecolor = Column(String)
     sheetcolor = Column(String)
 
-    wattage = Column(Integer)
+    wattage = Column(Integer, index=True)
     vocstc = Column(Float)
 
-    product_id = Column(Integer, ForeignKey("product.id"))
+    width = Column(Float)
+    height = Column(Float)
+    sellprice = Column(Float)
 
 
 
@@ -54,11 +58,9 @@ class MountingSystem(Base):
 class MountingComponent(Base):
     __tablename__ = "mountingcomponent"
 
-    id = Column(Integer, primary_key=True, index=True)
-
     rendercolor = Column(String)
 
     mountingsystem = Column(String, ForeignKey("mountingsystem.name"))
-    product_id = Column(Integer, ForeignKey("product.id"))
+    product_code = Column(VARCHAR(30), ForeignKey("product.TAman_code"), primary_key=True)
 
 

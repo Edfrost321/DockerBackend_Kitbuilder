@@ -1,14 +1,21 @@
 import os
 from dotenv import load_dotenv
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response, File, UploadFile, HTTPException
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware, db
+from io import BytesIO
 
-from schema import Customer, Product, Panel, MountingSystem, MountingComponent
+
+from schema import Customer, Product, Panel, MountingSystemCreate, MountingSystem, MountingComponent
 from models import Product as ModelProduct
+from models import Panel as ModelPanel
 from models import Customer as ModelCustomer
+from models import MountingSystem as ModelMsys
 import crud
+
+import pandas as pd
 
 load_dotenv(".env")
 
@@ -50,7 +57,10 @@ async def get_all_customers():
     customers = crud.get_customers(db.session)
     return customers
 
-
+@app.post("/get_panels/", response_model=list[Panel])
+async def get_all_panels():
+    panels = crud.get_panels(db.session)
+    return panels
 
 @app.post("/add-product/", response_model=Product)
 async def add_product(product: Product):
@@ -60,12 +70,37 @@ async def add_product(product: Product):
         TAdesc=product.TAdesc,
         TAsubcatid=product.TAsubcatid,
 
-        truewidth=product.truewidth,
-        trueheight=product.trueheight,
+        width=product.width,
+        height=product.height,
         sellprice=product.sellprice
     )
     db.session.add(db_product)
     db.session.commit()
     return db_product
 
-# @app.get("/get-panel/", response_model=Panel)
+
+@app.post("/add-productcsv/")
+async def add_productcsv(file: UploadFile = File(...)):
+    try:
+        contents = file.file.read()
+        buffer = BytesIO(contents) 
+        df = pd.read_csv(buffer)
+        print(df.head())
+        return Response(status_code=200)
+    except:
+        raise HTTPException(status_code=500, detail='Something went wrong')
+    finally:
+        buffer.close()
+        file.file.close()
+
+
+
+# Mounting
+@app.post("/add-mountingsys/", response_model=MountingSystemCreate)
+async def add_mountingsys(mountingsys: MountingSystemCreate):
+    db_msys = ModelMsys(
+        name=mountingsys.name
+    )
+    db.session.add(db_msys)
+    db.session.commit()
+    return db_msys
