@@ -23,7 +23,7 @@ class Product(Base):
 
     width = Column(Float)
     height = Column(Float)
-    sellprice = Column(Numeric(2))
+    sellprice = Column(Float)
 
     mountingcomponent = relationship("MountingComponent", uselist=False, backref="product")
     
@@ -61,6 +61,6 @@ class MountingComponent(Base):
     rendercolor = Column(String)
 
     mountingsystem = Column(String, ForeignKey("mountingsystem.name"))
-    product_code = Column(VARCHAR(30), ForeignKey("product.TAman_code"), primary_key=True)
+    product_code = Column(VARCHAR(30), ForeignKey("product.TAman_code"), primary_key=True, index=True)
 
 

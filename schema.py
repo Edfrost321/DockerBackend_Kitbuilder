@@ -42,7 +42,7 @@ class Panel(BaseModel):
 class MountingComponent(BaseModel):
 
     rendercolor: str
-    product_id: str
+    product_code: str
     mountingsystem: str
 
     class Config:

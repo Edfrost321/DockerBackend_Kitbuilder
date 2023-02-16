@@ -52,15 +52,25 @@ async def add_customer(customer: Customer):
     return db_customer
 
 
-@app.post("/get_customers/", response_model=list[Customer])
+@app.get("/get_customers/", response_model=list[Customer])
 async def get_all_customers():
     customers = crud.get_customers(db.session)
     return customers
 
-@app.post("/get_panels/", response_model=list[Panel])
+@app.get("/get_panels/", response_model=list[Panel])
 async def get_all_panels():
     panels = crud.get_panels(db.session)
     return panels
+
+@app.get("/get_products/", response_model=list[Product])
+async def get_all_products():
+    products = crud.get_products(db.session)
+    return products
+
+@app.get("/get_mounting/", response_model=list[MountingComponent])
+async def get_all_mounting():
+    products = crud.get_mounting(db.session)
+    return products
 
 @app.post("/add-product/", response_model=Product)
 async def add_product(product: Product):
@@ -77,22 +87,6 @@ async def add_product(product: Product):
     db.session.add(db_product)
     db.session.commit()
     return db_product
-
-
-@app.post("/add-productcsv/")
-async def add_productcsv(file: UploadFile = File(...)):
-    try:
-        contents = file.file.read()
-        buffer = BytesIO(contents) 
-        df = pd.read_csv(buffer)
-        print(df.head())
-        return Response(status_code=200)
-    except:
-        raise HTTPException(status_code=500, detail='Something went wrong')
-    finally:
-        buffer.close()
-        file.file.close()
-
 
 
 # Mounting
