@@ -1,8 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 class Customer(BaseModel):
     acccode: str
     accname: str
+
+    class Config:
+        orm_mode = True
+
+class UserCreate(BaseModel):
+    acccode: str
+    email: EmailStr
+    password: str
+    isStaff: bool
 
     class Config:
         orm_mode = True

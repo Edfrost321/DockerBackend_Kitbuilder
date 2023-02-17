@@ -1,16 +1,35 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Float, Numeric, VARCHAR
+from sqlalchemy import Column, DateTime, TIMESTAMP ,ForeignKey, Integer, String, Float, Numeric, VARCHAR, BOOLEAN
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 
 Base = declarative_base()
 
+
+
 class Customer(Base):
     __tablename__ = "customer"
 
     acccode = Column(String, primary_key=True, index=True)
     accname = Column(String)
+
+class User(Base):
+    __tablename__ = "user"
+
+    acccode = Column(
+        String,
+        ForeignKey("customer.acccode"),
+        index=True,
+        nullable=True
+    )
+
+    email = Column(String, nullable=False, primary_key=True)
+    password = Column(String, nullable=False)
+    isStaff = Column(BOOLEAN, server_default='FALSE')
+    createdat = Column(TIMESTAMP(timezone=True),
+                            nullable=False, server_default=text('now()'))
 
 
 class Product(Base):

@@ -1,18 +1,19 @@
 import os
 from dotenv import load_dotenv
 import uvicorn
-from fastapi import FastAPI, Request, Response, File, UploadFile, HTTPException
+from fastapi import FastAPI, status, Request, Response, File, UploadFile, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from io import BytesIO
 
 
-from schema import Customer, Product, Panel, MountingSystemCreate, MountingSystem, MountingComponent
+from schema import Customer, UserCreate, Product, Panel, MountingSystemCreate, MountingSystem, MountingComponent
 from models import Product as ModelProduct
 from models import Panel as ModelPanel
 from models import Customer as ModelCustomer
 from models import MountingSystem as ModelMsys
+from models import User as ModelUser
 import crud
 
 import pandas as pd
@@ -89,12 +90,15 @@ async def add_product(product: Product):
     return db_product
 
 
-# Mounting
-@app.post("/add-mountingsys/", response_model=MountingSystemCreate)
-async def add_mountingsys(mountingsys: MountingSystemCreate):
-    db_msys = ModelMsys(
-        name=mountingsys.name
+@app.post("/users", status_code=status.HTTP_201_CREATED)
+def create_user(user: UserCreate):
+    db_user = ModelUser(
+        acccode=user.acccode,
+        email=user.email,
+        password=user.password,
+        isStaff=user.isStaff
     )
-    db.session.add(db_msys)
+    db.session.add(db_user)
     db.session.commit()
-    return db_msys
+    return db_user
+
